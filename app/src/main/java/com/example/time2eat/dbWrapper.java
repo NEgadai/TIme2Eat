@@ -10,11 +10,10 @@ public class dbWrapper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Time2Eat.db";
     public static final String TABLE_NAME = "products_table";
-    public static final String COL_1 = "PRICE";
-    public static final String COL_2 = "FIRSTNAME";
-    public static final String COL_3 = "LASTNAME";
-    public static final String COL_4 = "CITY";
-    public static final String COL_5 = "AVERAGE";
+    public static final String COL_1 = "ID";
+    public static final String COL_2 = "NAME";
+    public static final String COL_3 = "INGREDIENTS";
+    public static final String COL_4 = "PRICE";
 
     public dbWrapper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -22,7 +21,7 @@ public class dbWrapper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,FIRSTNAME TEXT,LASTNAME TEXT,CITY TEXT,AVERAGE INTEGER)");
+        db.execSQL("create table " + TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,FIRSTNAME TEXT,LASTNAME TEXT,CITY TEXT,AVERAGE FLOAT)");
     }
 
     @Override
@@ -31,13 +30,13 @@ public class dbWrapper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertData(String firstName,String lastName,String city, int average) {
+    public boolean insertData(int id, String name,String ingredients, float price) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_2,firstName);
-        contentValues.put(COL_3,lastName);
-        contentValues.put(COL_4,city);
-        contentValues.put(COL_5,average);
+        contentValues.put(COL_1,id);
+        contentValues.put(COL_2,name);
+        contentValues.put(COL_3,ingredients);
+        contentValues.put(COL_4,price);
         long result = db.insert(TABLE_NAME,null ,contentValues);
         if(result == -1)
             return false;

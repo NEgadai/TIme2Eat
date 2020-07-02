@@ -10,40 +10,50 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00F5F5F5"
+        android:background="#009688"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tablayout"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="1dp"
-        tools:ignore="MissingConstraints">
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        tools:layout_editor_absoluteX="1dp" >
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/maindish"
-            android:layout_width="wrap_content"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tablayout"
+            android:layout_width="409dp"
             android:layout_height="wrap_content"
-            android:text="main dish" />
+            android:layout_marginTop="24dp"
+            tools:ignore="MissingConstraints">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/maindish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="main dish" />
 
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/desserts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="desserts" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/desserts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="desserts" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/drinks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="drinks" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/drinks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="drinks" />
 
-    </com.google.android.material.tabs.TabLayout>
+        </com.google.android.material.tabs.TabLayout>
+    </androidx.viewpager.widget.ViewPager>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
