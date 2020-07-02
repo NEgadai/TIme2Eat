@@ -5,15 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import java.util.ArrayList;
 
 public class dbWrapper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Time2Eat.db";
-    public static final String TABLE_NAME = "products_table";
-    public static final String COL_1 = "ID";
-    public static final String COL_2 = "NAME";
-    public static final String COL_3 = "INGREDIENTS";
-    public static final String COL_4 = "PRICE";
+    public static ArrayList<Product> products = new ArrayList<>();
+    public static ArrayList<Table> tables = new ArrayList<Table>();
 
     public dbWrapper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -21,42 +19,62 @@ public class dbWrapper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE_NAME +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,FIRSTNAME TEXT,LASTNAME TEXT,CITY TEXT,AVERAGE FLOAT)");
+        db.execSQL("create table " + Product.tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,NAME TEXT,INGREDIENTS TEXT,PRICE INT)");
+        db.execSQL("create table " + Table.tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,PRODUCT_NAME TEXT,PRODUCT_PRICE INT,PRODUCT_INGREDTIENTS TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Product.tableName);
+        db.execSQL("DROP TABLE IF EXISTS " + Table.tableName);
         onCreate(db);
     }
 
-    public boolean insertData(int id, String name,String ingredients, float price) {
+    public void insertTable(Table table) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_1,id);
-        contentValues.put(COL_2,name);
-        contentValues.put(COL_3,ingredients);
-        contentValues.put(COL_4,price);
-        long result = db.insert(TABLE_NAME,null ,contentValues);
+
+        tables.add(table);
+        ArrayList<Product> current_products = table.getProducts();
+        for(int i=0; i < current_products.size(); i++){
+            contentValues.put("ID", table.getID());
+            contentValues.put("PRODUCT_NAME", current_products.get(i).getName());
+            contentValues.put("PRODUCT_PRICE", current_products.get(i).getPrice());
+            contentValues.put("PRODUCT_INGREDTIENTS", current_products.get(i).getIngredient());
+            db.insert(Table.tableName,null ,contentValues);
+        }
+    }
+
+    public boolean insertProdcut(Product prod) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        products.add(prod);
+        contentValues.put("ID", prod.getID());
+        contentValues.put("NAME", prod.getName());
+        contentValues.put("INGREDIENTS", prod.getIngredient());
+        contentValues.put("PRICE", prod.getPrice());
+        long result = db.insert(Product.tableName,null ,contentValues);
         if(result == -1)
             return false;
         else
             return true;
     }
-    public Cursor getAllData() {
+
+    public Cursor getAllData(String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from "+TABLE_NAME,null);
+        Cursor res = db.rawQuery("select * from "+tableName,null);
         return res;
     }
 
-    public Cursor getAllDataSorted() {
+    public Cursor getAllDataSorted(String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME + " order by average desc",null);
+        Cursor res = db.rawQuery("select * from " + tableName + " order by average desc",null);
         return res;
     }
 
-    public Integer deleteData(String id) {
+    public Integer deleteData(String id, String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(TABLE_NAME, "ID = ?",new String[] {id});
+        return db.delete(tableName, "ID = ?",new String[] {id});
     }
 }
