@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class dbWrapper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Time2Eat.db";
-    public static ArrayList<Product> products = new ArrayList<>();
-    public static ArrayList<Table> tables = new ArrayList<Table>();
+    public static ArrayList<Product> products = new ArrayList<Product>();
+    public static ArrayList<Table> tables = new ArrayList<Table>(){};
 
     public dbWrapper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -19,8 +19,16 @@ public class dbWrapper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // initial tables
+        products.add(new Product("Bread", 25, "flour, water"));
+        products.add(new Product("Pizza", 50, "cheese, tomato sauce, dough"));
+        products.add(new Product("steak", 100, "ribeye steak"));
+        tables.add(new Table());
+        tables.add(new Table());
+        tables.add(new Table());
+
         db.execSQL("create table " + Product.tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,NAME TEXT,INGREDIENTS TEXT,PRICE INT)");
-        db.execSQL("create table " + Table.tableName +" (ID INTEGER PRIMARY KEY AUTOINCREMENT,PRODUCT_NAME TEXT,PRODUCT_PRICE INT,PRODUCT_INGREDTIENTS TEXT)");
+        db.execSQL("create table " + Table.tableName +" (ID INTEGER,PRODUCTS_IDS TEXT)");
     }
 
     @Override
@@ -30,37 +38,32 @@ public class dbWrapper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertTable(Table table) {
+    public void insertProdcutToTable(int table_id, ArrayList<Product> products) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        tables.add(table);
-        ArrayList<Product> current_products = table.getProducts();
-        for(int i=0; i < current_products.size(); i++){
-            contentValues.put("ID", table.getID());
-            contentValues.put("PRODUCT_NAME", current_products.get(i).getName());
-            contentValues.put("PRODUCT_PRICE", current_products.get(i).getPrice());
-            contentValues.put("PRODUCT_INGREDTIENTS", current_products.get(i).getIngredient());
-            db.insert(Table.tableName,null ,contentValues);
+        for (int i = 0; i < tables.size(); i++){
+            if (tables.get(i).getID() == table_id){
+                for(int j = 0; j < products.size(); j++){
+                    Product cur_prod = products.get(i);
+                    tables.get(i).addProduct(cur_prod);
+                    contentValues.put("ID", table_id);
+                    contentValues.put("PRODUCTS_IDS", getProdcutsIdByTableName(Product.tableName, table_id) + " " + cur_prod.getID());
+                    db.insert(Product.tableName,null ,contentValues);
+                }
+            }
         }
     }
 
-    public boolean insertProdcut(Product prod) {
+    public String getProdcutsIdByTableName(String tableName, int tableID){
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-
-        products.add(prod);
-        contentValues.put("ID", prod.getID());
-        contentValues.put("NAME", prod.getName());
-        contentValues.put("INGREDIENTS", prod.getIngredient());
-        contentValues.put("PRICE", prod.getPrice());
-        long result = db.insert(Product.tableName,null ,contentValues);
-        if(result == -1)
-            return false;
-        else
-            return true;
+        Cursor res = db.rawQuery("select * from "+tableName+"where ID = "+tableID,null);
+        String rv = "";
+        if (res.moveToFirst()) {
+            rv = res.getString(res.getColumnIndex("PRODUCTS_IDS"));
+        }
+        return rv;
     }
-
     public Cursor getAllData(String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from "+tableName,null);

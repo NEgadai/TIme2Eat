@@ -46,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         List<String> tables = new ArrayList<>();
         tables.add(0, "Choose the table");
-        tables.add("1");
-        tables.add("2");
+        ArrayList<Table> exist_table = dbWrapper.tables;
+        for(int i = 0; i < exist_table.size(); i++)
+            tables.add(String.valueOf(exist_table.get(i).getID()));
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tables);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
